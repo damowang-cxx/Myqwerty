@@ -1,7 +1,7 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-import { customDictionaryResourcesAtom, currentChapterAtom, currentDictIdAtom } from '@/store'
+import { currentChapterAtom, currentDictIdAtom, customDictionaryResourcesAtom } from '@/store'
 import type { Word } from '@/typings'
 import { deleteCustomDictionary, exportCustomDictionary, saveCustomDictionary } from '@/utils/customDictionary'
 import { dictionaryLanguageProfiles, parseCustomDictionaryImport, splitDictionaryTags } from '@/utils/customDictionaryStorage'

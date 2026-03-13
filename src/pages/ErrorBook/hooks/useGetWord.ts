@@ -3,7 +3,7 @@ import { wordListFetcher } from '@/utils/wordListFetcher'
 import { useEffect, useMemo, useState } from 'react'
 import useSWR from 'swr'
 
-export default function useGetWord(name: string, dict: Dictionary) {
+export default function useGetWord(name: string, dict?: Dictionary) {
   const { data: wordList, error, isLoading } = useSWR(dict?.url, wordListFetcher)
   const [hasError, setHasError] = useState(false)
 

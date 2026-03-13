@@ -55,12 +55,14 @@
     "typescript": "^4.0.3",
     "use-immer": "^0.9.0",
     "use-sound": "^4.0.1",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "yarn": "^1.22.22"
   },
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "cross-env CI=false vite build --base=./",
+    "build": "cross-env CI=false vite build",
+    "serve:prod": "vite preview --host 0.0.0.0",
     "test": "echo \"No tests\"",
     "test:e2e": "playwright test",
     "lint": "eslint .",

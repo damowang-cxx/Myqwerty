@@ -1,9 +1,14 @@
 import type { Word } from '@/typings'
+import { withBase } from '@/utils/basePath'
+import { getCustomDictionaryWordsByUrl } from '@/utils/customDictionary'
+import { isCustomDictionaryUrl } from '@/utils/customDictionaryStorage'
 
 export async function wordListFetcher(url: string): Promise<Word[]> {
-  const URL_PREFIX: string = REACT_APP_DEPLOY_ENV === 'pages' ? '/qwerty-learner' : ''
+  if (isCustomDictionaryUrl(url)) {
+    return getCustomDictionaryWordsByUrl(url)
+  }
 
-  const response = await fetch(URL_PREFIX + url)
+  const response = await fetch(withBase(url))
   const words: Word[] = await response.json()
   return words
 }

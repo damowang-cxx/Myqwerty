@@ -10,6 +10,8 @@ export type DictionaryResource = {
   length: number
   language: LanguageType
   languageCategory: LanguageCategoryType
+  source?: 'builtin' | 'custom'
+  updatedAt?: number
   //override default pronunciation when not undefined
   defaultPronIndex?: number
 }
@@ -24,6 +26,8 @@ export type Dictionary = {
   length: number
   language: LanguageType
   languageCategory: LanguageCategoryType
+  source?: 'builtin' | 'custom'
+  updatedAt?: number
   // calculated in the store
   chapterCount: number
   //override default pronunciation when not undefined

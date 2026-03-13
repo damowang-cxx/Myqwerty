@@ -9,8 +9,8 @@ import type { WordPronunciationIconRef } from '@/components/WordPronunciationIco
 import { WordPronunciationIcon } from '@/components/WordPronunciationIcon'
 import Phonetic from '@/pages/Typing/components/WordPanel/components/Phonetic'
 import Letter from '@/pages/Typing/components/WordPanel/components/Word/Letter'
-import { idDictionaryMap } from '@/resources/dictionary'
-import { useSetAtom } from 'jotai'
+import { dictionaryMapAtom } from '@/store'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { useCallback, useMemo, useRef } from 'react'
 import { useHotkeys } from 'react-hotkeys-hook'
 import HashtagIcon from '~icons/heroicons/chart-pie-20-solid'
@@ -26,8 +26,8 @@ type RowDetailProps = {
 
 const RowDetail: React.FC<RowDetailProps> = ({ currentRowDetail, allRecords }) => {
   const setCurrentRowDetail = useSetAtom(currentRowDetailAtom)
-
-  const dictInfo = idDictionaryMap[currentRowDetail.dict]
+  const dictionaryMap = useAtomValue(dictionaryMapAtom)
+  const dictInfo = dictionaryMap[currentRowDetail.dict]
   const { word, isLoading, hasError } = useGetWord(currentRowDetail.word, dictInfo)
   const wordPronunciationIconRef = useRef<WordPronunciationIconRef>(null)
 
@@ -79,7 +79,7 @@ const RowDetail: React.FC<RowDetailProps> = ({ currentRowDetail, allRecords }) =
             {word ? <Phonetic word={word} /> : <LoadingWordUI isLoading={isLoading} hasError={hasError} />}
             {word && (
               <WordPronunciationIcon
-                lang={dictInfo.language}
+                lang={dictInfo?.language ?? 'en'}
                 word={word}
                 className="absolute -right-7 top-1/2 h-5 w-5 -translate-y-1/2 transform "
                 ref={wordPronunciationIconRef}

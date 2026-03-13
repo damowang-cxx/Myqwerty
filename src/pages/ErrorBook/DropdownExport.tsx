@@ -1,7 +1,8 @@
-import { idDictionaryMap } from '@/resources/dictionary'
+import { dictionaryMapAtom } from '@/store'
 import { wordListFetcher } from '@/utils/wordListFetcher'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { saveAs } from 'file-saver'
+import { useAtomValue } from 'jotai'
 import type { FC } from 'react'
 import { useState } from 'react'
 import * as XLSX from 'xlsx'
@@ -12,6 +13,7 @@ type DropdownProps = {
 
 const DropdownExport: FC<DropdownProps> = ({ renderRecords }) => {
   const [isExporting, setIsExporting] = useState(false)
+  const dictionaryMap = useAtomValue(dictionaryMapAtom)
 
   const formatTimestamp = (date: any) => {
     const year = date.getFullYear()
@@ -31,7 +33,7 @@ const DropdownExport: FC<DropdownProps> = ({ renderRecords }) => {
       // 获取所有需要的词典数据
       const dictUrls: string[] = []
       renderRecords.forEach((item: any) => {
-        const dictInfo = idDictionaryMap[item.dict]
+        const dictInfo = dictionaryMap[item.dict]
         if (dictInfo?.url && !dictUrls.includes(dictInfo.url)) {
           dictUrls.push(dictInfo.url)
         }
@@ -54,7 +56,7 @@ const DropdownExport: FC<DropdownProps> = ({ renderRecords }) => {
       const ExportData: Array<{ 单词: string; 释义: string; 错误次数: number; 词典: string }> = []
 
       renderRecords.forEach((item: any) => {
-        const dictInfo = idDictionaryMap[item.dict]
+        const dictInfo = dictionaryMap[item.dict]
         let translation = ''
 
         if (dictInfo?.url && dictDataMap.has(dictInfo.url)) {

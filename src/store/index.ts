@@ -1,10 +1,11 @@
 import atomForConfig from './atomForConfig'
 import { reviewInfoAtom } from './reviewInfoAtom'
 import { DISMISS_START_CARD_DATE_KEY, defaultFontSizeConfig } from '@/constants'
-import { idDictionaryMap } from '@/resources/dictionary'
+import { dictionaries as builtInDictionaries, idDictionaryMap as builtInDictionaryMap } from '@/resources/dictionary'
 import { correctSoundResources, keySoundResources, wrongSoundResources } from '@/resources/soundResource'
 import type {
   Dictionary,
+  DictionaryResource,
   InfoPanelState,
   LoopWordTimesOption,
   PhoneticType,
@@ -12,17 +13,35 @@ import type {
   WordDictationOpenBy,
   WordDictationType,
 } from '@/typings'
+import { calcChapterCount } from '@/utils'
+import { readStoredCustomDictionaryResources } from '@/utils/customDictionaryStorage'
 import type { ReviewRecord } from '@/utils/db/record'
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
 export const currentDictIdAtom = atomWithStorage('currentDict', 'cet4')
+export const customDictionaryResourcesAtom = atomWithStorage<DictionaryResource[]>(
+  'customDictionaryResources',
+  readStoredCustomDictionaryResources(),
+)
+export const allDictionariesAtom = atom<Dictionary[]>((get) => {
+  const customDictionaries = get(customDictionaryResourcesAtom).map((resource) => ({
+    ...resource,
+    chapterCount: calcChapterCount(resource.length),
+  }))
+
+  return [...builtInDictionaries, ...customDictionaries]
+})
+export const dictionaryMapAtom = atom<Record<string, Dictionary>>((get) =>
+  Object.fromEntries(get(allDictionariesAtom).map((dict) => [dict.id, dict])),
+)
 export const currentDictInfoAtom = atom<Dictionary>((get) => {
   const id = get(currentDictIdAtom)
-  let dict = idDictionaryMap[id]
+  const dictionaryMap = get(dictionaryMapAtom)
+  let dict = dictionaryMap[id]
   // 如果 dict 不存在，则返回 cet4. Typing 中会检查 DictId 是否存在，如果不存在则会重置为 cet4
   if (!dict) {
-    dict = idDictionaryMap.cet4
+    dict = builtInDictionaryMap.cet4
   }
   return dict
 })

@@ -4,6 +4,7 @@ interface ImportMetaEnv {
   readonly VITE_BASE_PATH?: string
   readonly VITE_PORT?: string
   readonly VITE_PREVIEW_PORT?: string
+  readonly VITE_ENGLISH_LEARNING_EXPORT_URL?: string
 }
 
 interface ImportMeta {

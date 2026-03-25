@@ -237,7 +237,7 @@ export default function DictionaryTransfer() {
             <DialogHeader>
               <DialogTitle>Import Dictionary</DialogTitle>
               <DialogDescription>
-                Supports both plain arrays like <code>[&#123;"name","trans"&#125;]</code> and exported bundles with
+                Supports both plain arrays like <code>[&#123;&quot;name&quot;,&quot;trans&quot;&#125;]</code> and exported bundles with
                 <code>dictionary</code> plus <code>words</code>.
               </DialogDescription>
             </DialogHeader>

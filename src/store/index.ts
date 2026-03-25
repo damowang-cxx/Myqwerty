@@ -14,8 +14,14 @@ import type {
   WordDictationType,
 } from '@/typings'
 import { calcChapterCount } from '@/utils'
-import { readStoredCustomDictionaryResources } from '@/utils/customDictionaryStorage'
+import { buildCustomDictionaryUrl, readStoredCustomDictionaryResources } from '@/utils/customDictionaryStorage'
 import type { ReviewRecord } from '@/utils/db/record'
+import {
+  ENGLISH_LEARNING_GLOBAL_DICT_CATEGORY,
+  ENGLISH_LEARNING_GLOBAL_DICT_ID,
+  ENGLISH_LEARNING_GLOBAL_DICT_NAME,
+  ENGLISH_LEARNING_GLOBAL_DICT_TAGS,
+} from '@/utils/englishLearningSync'
 import { atom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 
@@ -24,22 +30,47 @@ export const customDictionaryResourcesAtom = atomWithStorage<DictionaryResource[
   'customDictionaryResources',
   readStoredCustomDictionaryResources(),
 )
-export const allDictionariesAtom = atom<Dictionary[]>((get) => {
-  const customDictionaries = get(customDictionaryResourcesAtom).map((resource) => ({
-    ...resource,
-    chapterCount: calcChapterCount(resource.length),
-  }))
 
-  return [...builtInDictionaries, ...customDictionaries]
+export const allDictionariesAtom = atom<Dictionary[]>((get) => {
+  const customResources = get(customDictionaryResourcesAtom)
+  const syncedListeningDictionary = customResources.find((resource) => resource.id === ENGLISH_LEARNING_GLOBAL_DICT_ID)
+
+  const customDictionaries = customResources
+    .filter((resource) => resource.id !== ENGLISH_LEARNING_GLOBAL_DICT_ID)
+    .map((resource) => ({
+      ...resource,
+      chapterCount: calcChapterCount(resource.length),
+    }))
+
+  const listeningVocabularyDictionary: Dictionary = {
+    id: ENGLISH_LEARNING_GLOBAL_DICT_ID,
+    name: ENGLISH_LEARNING_GLOBAL_DICT_NAME,
+    description: 'Synced from English_Learning global vocabulary.',
+    category: '中国考试',
+    tags: ['我的'],
+    url: buildCustomDictionaryUrl(ENGLISH_LEARNING_GLOBAL_DICT_ID),
+    length: syncedListeningDictionary?.length ?? 0,
+    language: 'en',
+    languageCategory: 'en',
+    source: 'custom',
+    updatedAt: syncedListeningDictionary?.updatedAt,
+    chapterCount: calcChapterCount(syncedListeningDictionary?.length ?? 0),
+  }
+  listeningVocabularyDictionary.category = ENGLISH_LEARNING_GLOBAL_DICT_CATEGORY
+  listeningVocabularyDictionary.tags = ENGLISH_LEARNING_GLOBAL_DICT_TAGS
+
+  return [...builtInDictionaries, ...customDictionaries, listeningVocabularyDictionary]
 })
+
 export const dictionaryMapAtom = atom<Record<string, Dictionary>>((get) =>
   Object.fromEntries(get(allDictionariesAtom).map((dict) => [dict.id, dict])),
 )
+
 export const currentDictInfoAtom = atom<Dictionary>((get) => {
   const id = get(currentDictIdAtom)
   const dictionaryMap = get(dictionaryMapAtom)
   let dict = dictionaryMap[id]
-  // 如果 dict 不存在，则返回 cet4. Typing 中会检查 DictId 是否存在，如果不存在则会重置为 cet4
+
   if (!dict) {
     dict = builtInDictionaryMap.cet4
   }
@@ -82,7 +113,6 @@ export const pronunciationConfigAtom = atomForConfig('pronunciation', {
 export const fontSizeConfigAtom = atomForConfig('fontsize', defaultFontSizeConfig)
 
 export const pronunciationIsOpenAtom = atom((get) => get(pronunciationConfigAtom).isOpen)
-
 export const pronunciationIsTransReadAtom = atom((get) => get(pronunciationConfigAtom).isTransRead)
 
 export const randomConfigAtom = atomForConfig('randomConfig', {
@@ -90,11 +120,8 @@ export const randomConfigAtom = atomForConfig('randomConfig', {
 })
 
 export const isShowPrevAndNextWordAtom = atomWithStorage('isShowPrevAndNextWord', true)
-
 export const isIgnoreCaseAtom = atomWithStorage('isIgnoreCase', true)
-
 export const isShowAnswerOnHoverAtom = atomWithStorage('isShowAnswerOnHover', true)
-
 export const isTextSelectableAtom = atomWithStorage('isTextSelectable', false)
 
 export const reviewModeInfoAtom = reviewInfoAtom({
@@ -109,9 +136,7 @@ export const phoneticConfigAtom = atomForConfig('phoneticConfig', {
 })
 
 export const isOpenDarkModeAtom = atomWithStorage('isOpenDarkModeAtom', window.matchMedia('(prefers-color-scheme: dark)').matches)
-
 export const isShowSkipAtom = atom(false)
-
 export const isInDevModeAtom = atom(false)
 
 export const infoPanelStateAtom = atom<InfoPanelState>({
@@ -128,9 +153,4 @@ export const wordDictationConfigAtom = atomForConfig('wordDictationConfig', {
 })
 
 export const dismissStartCardDateAtom = atomWithStorage<Date | null>(DISMISS_START_CARD_DATE_KEY, null)
-
-// Enhanced version promotion popup state
 export const hasSeenEnhancedPromotionAtom = atomWithStorage('hasSeenEnhancedPromotion', false)
-
-// for dev test
-//   dismissStartCardDateAtom = atom<Date | null>(new Date())

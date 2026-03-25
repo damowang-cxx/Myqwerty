@@ -329,3 +329,15 @@ JS API 来自于[react-code-game](https://github.com/webzhd/react-code-game) ，
 ## 🌟 Stargazers over time
 
 [![Stargazers over time](https://starchart.cc/Realkai42/qwerty-learner.svg)](https://starchart.cc/Realkai42/qwerty-learner)
+
+## English Learning Global Vocabulary Pull
+
+- Gallery English tab now contains `我的 -> 听力生词`.
+- Open `听力生词` dictionary detail and click sync button to pull from English Learning.
+- Pull target dictionary id remains fixed: `english-learning-global`.
+- Default source URL: `/listen/api/vocabulary/global/export`.
+- Optional override for local cross-port testing:
+
+```bash
+VITE_ENGLISH_LEARNING_EXPORT_URL=http://localhost:4000/listen/api/vocabulary/global/export
+```
